@@ -1,5 +1,5 @@
-import express, { Request, Response } from "express";
-import { createNewUser, findUserBySupabaseId } from "../controllers/userController";
+import express from "express";
+import { createNewUser, findUserBySupabaseId } from "../controllers/userController.ts";
 const router = express.Router();
 
 router.post("/", createNewUser);

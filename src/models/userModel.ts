@@ -1,12 +1,10 @@
-import supabase from "../supabaseClient"
-
 interface user {
     supabase_id: string;
     username: string;
 }
 
 // Insert new user to Supabase
-export const create = async (user:user) => {
+export const create = async (user:user, supabase:any) => {
     const { error } = await supabase
         .from("User")
         .insert(user)
@@ -17,7 +15,7 @@ export const create = async (user:user) => {
 }
 
 // Fetch user from Supabase by Supabase Id
-export const findById = async (supabaseId:string) => {
+export const findById = async (supabaseId:string, supabase:any) => {
     const { data, error } = await supabase
         .from("User")
         .select("*")
