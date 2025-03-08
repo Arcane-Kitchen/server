@@ -12,3 +12,16 @@ export const findById = async (recipeId:string, supabase:any) => {
 
     return data;
 }
+
+export const getAll = async (supabase:any) => {
+    const { data, error } = await supabase
+        .from("Recipe")
+        .select();
+    
+    if (error) {
+        console.error("Error fetching all recipes: ", error);
+        return null;
+    }
+
+    return data;
+}
