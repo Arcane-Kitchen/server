@@ -54,3 +54,14 @@ export const updateRecipe = async(mealPlanId:string, recipe:Partial<recipe>, sup
 
     return data;
 }
+
+export const deleteRecipe = async(mealPlanId:string, supabase:any) => {
+    const { error } = await supabase
+        .from("User_Recipe")
+        .delete()
+        .eq("id", mealPlanId)
+
+    if(error) {
+        throw new Error(error.message);
+    }
+}

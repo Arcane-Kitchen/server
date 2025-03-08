@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { getMealPlan, getRecipe, addRecipe, updateRecipe } from "../models/mealPlanModel.ts"
+import { getMealPlan, getRecipe, addRecipe, updateRecipe, deleteRecipe } from "../models/mealPlanModel.ts"
 import { findById } from "../models/recipeModel.ts"
 import getSupabaseClientWithAuth from "../utils/supabase.ts";
 import { setXPForRecipeDifficulty } from "../utils/xpHelper.ts";
@@ -75,6 +75,7 @@ export const addRecipeToMealPlan = async (req: Request, res: Response) => {
 
 
     try {
+        // Check and fetch the recipe from the meal plan
         const recipe = await findById(recipeId, supabase);
         if (!recipe || recipe.length === 0) {
             res.status(404).json({ message: "Recipe not found" });
@@ -115,7 +116,7 @@ export const updateRecipeInMealPlan = async (req: Request, res: Response) => {
     if (!supabase) return;
 
     try {
-        // Fetch the recipe from the meal
+        // Check if the recipe exists in the meal plan
         const recipe = await getRecipe(mealPlanId, supabase);
         if (!recipe || recipe.length === 0) {
             res.status(404).json({ message: "Recipe not found in the meal plan" });
@@ -132,6 +133,34 @@ export const updateRecipeInMealPlan = async (req: Request, res: Response) => {
         // Update the recipe in the meal plan
         await updateRecipe(mealPlanId, recipeProps, supabase);
         res.status(200).json({ message: "Meal plan updated successfully" });
+
+    } catch (error:any) {
+        res.status(500).json({ error: error.message })
+    }
+}
+
+// Delete recipe from the user's meal plan
+export const removeRecipeFromMealPlan = async(req: Request, res: Response) => {
+    const { mealPlanId } = req.params;
+    const token = req.get("X-Supabase-Auth");
+
+    // Token Validation
+    if (!validateToken(token, res)) return;
+
+    const supabase = await getSupabaseClientWithAuth(token!, res);
+    if (!supabase) return;
+
+    try {
+        // Check if the recipe exists in the meal plan
+        const recipe = await getRecipe(mealPlanId, supabase);
+        if (!recipe || recipe.length === 0) {
+            res.status(404).json({ message: "Recipe not found in the meal plan" });
+            return;
+        }
+
+        // Delete recipe from the meal plan
+        await deleteRecipe(mealPlanId, supabase);
+        res.status(204).json({ message: "Recipe deleted from meal plan successfully" });
 
     } catch (error:any) {
         res.status(500).json({ error: error.message })
