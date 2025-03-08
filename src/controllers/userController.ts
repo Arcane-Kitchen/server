@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { create, findById } from "../models/userModel.ts";
-import getSupabaseClientWithAuth from "../util/supabaseClient.ts";
+import getSupabaseClientWithAuth from "../utils/supabase.ts";
 
 // create a new user
 export const createNewUser = async (req: Request, res: Response): Promise<void> => {
@@ -8,7 +8,7 @@ export const createNewUser = async (req: Request, res: Response): Promise<void> 
     const token = req.get("X-Supabase-Auth");
 
     if (!supabaseId || !username) {
-        res.status(400).json({ error: 'Required fields are missing' });
+        res.status(400).json({ error: "Required fields are missing" });
         return;
     }
 
@@ -27,7 +27,7 @@ export const createNewUser = async (req: Request, res: Response): Promise<void> 
         }
 
         await create({ "supabase_id": supabaseId, username }, supabase);
-        res.status(201).json({ message: 'New user added successfully'});
+        res.status(201).json({ message: "New user added successfully" });
     } catch (error:any) {
         res.status(500).json({ error: error.message })
     }

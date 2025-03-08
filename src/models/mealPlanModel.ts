@@ -1,10 +1,9 @@
-import supabase from "../supabaseClient"
-
-// Fetch meal plan from Supabase database by user Id
-export const getMealPlan = async(userId:string, start:string, end:string) => {
+// Fetch meal plan from Supabase by user Id
+export const getMealPlan = async(userId:string, start:string, end:string, supabase:any) => {
     const { data, error } = await supabase
         .from("User_Recipe")
         .select()
+        .eq("user_id", userId)
         .gte("day_to_eat", start)
         .lte("day_to_eat", end)
 
@@ -14,3 +13,5 @@ export const getMealPlan = async(userId:string, start:string, end:string) => {
 
     return data;
 }
+
+export const addRecipe = async()

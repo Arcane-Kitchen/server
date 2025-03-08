@@ -1,5 +1,9 @@
 import { Request, Response } from "express";
-import { getMealPlan } from "../models/mealPlanModel"
+import { getMealPlan, addRecipe } from "../models/mealPlanModel.ts"
+import { findById } from "../models/recipeModel.ts"
+import getSupabaseClientWithAuth from "../utils/supabase.ts";
+import { setXPForRecipeDifficulty } from "../utils/xpHelper.ts";
+import { validateToken, validateProps } from "../utils/validation.ts"
 
 // Format date to YYYY-MM-DD
 const formatDate = (date: Date) => {
@@ -9,10 +13,30 @@ const formatDate = (date: Date) => {
     return `${year}-${month}-${day}`;
 };
 
-export const getUserWeeklyMealPlan = async (req: Request, res: Response) => {
-    try {
-        const { id } = req.params;
+// Define the recipe interface
+export interface recipe {
+    user_id: string,
+    recipe_id: string,
+    day_to_eat: string,
+    servings?: number
+    exp: number
+    chosen_meal_type: string,
+    has_been_eaten?: boolean,
+}
 
+// Fetch the user's meal plan for the week
+export const getUserWeeklyMealPlan = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const token = req.get("X-Supabase-Auth");
+
+    // Token validation
+    if (!validateToken(token, res)) return;
+
+    const supabase = await getSupabaseClientWithAuth(token!, res);
+    if (!supabase) return;
+
+    try {
+        // calculate the start and end of the weekly meal plan
         const currentDate = new Date();
         const currentDay = currentDate.getDay();
 
@@ -25,9 +49,56 @@ export const getUserWeeklyMealPlan = async (req: Request, res: Response) => {
         const formattedStartOfWeek = formatDate(startOfWeek);
         const formattedEndOfWeek = formatDate(endOfWeek);
 
-        const results = await getMealPlan(id, formattedStartOfWeek, formattedEndOfWeek);
+        // Fetch the user's meal plan
+        const results = await getMealPlan(id, formattedStartOfWeek, formattedEndOfWeek, supabase);
         res.status(200).json(results);
     } catch (error:any) {
+        res.status(500).json({ error: error.message })
+    }
+}
+
+// Add a recipe to the user's weekly meal plan
+export const addRecipeToMealPlan = async (req: Request, res: Response) => {
+    const { id, recipeId } = req.params;
+    const { dayToEat, servings, hasBeenEaten, chosenMealType } = req.body;
+    const token = req.get("X-Supabase-Auth");
+
+    // Token Validation
+    if (!validateToken(token, res)) return;
+
+    const supabase = await getSupabaseClientWithAuth(token!, res);
+    if (!supabase) return;
+
+    // Validate required props
+    const requiredProps = ["dayToEat", "chosenMealType"];
+    if (!validateProps(req.body, requiredProps, res)) return;
+
+
+    try {
+        const recipe = await findById(recipeId, supabase);
+        if (!recipe || recipe.length === 0) {
+            res.status(404).json({ message: "Recipe not found" });
+            return;
+        }
+    
+        const difficulty = recipe[0].difficulty;
+        const exp = setXPForRecipeDifficulty(difficulty);
+
+        const recipeProps: recipe = {
+            "user_id": id,
+            "recipe_id": recipeId,
+            "day_to_eat": dayToEat,
+            exp,
+            "chosen_meal_type": chosenMealType,
+        }
+
+        if (servings !== undefined) recipeProps.servings = servings;
+        if (hasBeenEaten !== undefined) recipeProps.has_been_eaten = hasBeenEaten;
+
+        await addRecipe(recipeProps, supabase);
+        res.status(201).json({ message: "New recipe added to meal plan successfully" });
+
+    } catch (error: any) {
         res.status(500).json({ error: error.message })
     }
 }
