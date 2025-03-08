@@ -1,33 +1,26 @@
 import { Request, Response } from 'express';
 import { create, findById } from "../models/userModel.ts";
-import getSupabaseClientWithAuth from "../util/supabaseClient.ts";
+import getSupabaseClientWithAuth from "../utils/supabase.ts";
+import { validateToken, validateProps } from "../utils/validation.ts"
 
 // create a new user
 export const createNewUser = async (req: Request, res: Response): Promise<void> => {
     const { supabaseId, username } = req.body;
     const token = req.get("X-Supabase-Auth");
 
-    if (!supabaseId || !username) {
-        res.status(400).json({ error: 'Required fields are missing' });
-        return;
-    }
+    // Token Validation
+    if (!validateToken(token, res)) return;
+    
+    const supabase = await getSupabaseClientWithAuth(token!, res);
+    if (!supabase) return;
 
-    if (!token) {
-        res.status(403).json({ error: "No token provided" });
-        return;
-    }
+    // Validate required props
+    const requiredProps = ["supabaseId", "username"];
+    if (!validateProps(req.body, requiredProps, res)) return;
 
     try {
-        const supabase = getSupabaseClientWithAuth(token);
-        const { data : { user } } = await supabase.auth.getUser();
-
-        if (!user) {
-            res.status(401).json({ error: "Invalid or expired token" });
-            return;
-        }
-
         await create({ "supabase_id": supabaseId, username }, supabase);
-        res.status(201).json({ message: 'New user added successfully'});
+        res.status(201).json({ message: "New user added successfully" });
     } catch (error:any) {
         res.status(500).json({ error: error.message })
     }
@@ -38,21 +31,13 @@ export const findUserBySupabaseId = async (req: Request, res: Response): Promise
     const { id } = req.params;
     const token = req.get("X-Supabase-Auth");
 
-    if (!token) {
-        res.status(403).json({ error: "No token provided" });
-        return;
-    }
+    // Token validation
+    if (!validateToken(token, res)) return;
 
-    try {
+    const supabase = await getSupabaseClientWithAuth(token!, res);
+    if (!supabase) return;
 
-        const supabase = getSupabaseClientWithAuth(token);
-        const { data : { user } } = await supabase.auth.getUser();
-
-        if (!user) {
-            res.status(401).json({ error: "Invalid or expired token" });
-            return;
-        }
-        
+    try {        
         const result = await findById(id, supabase);
     
         if (!result || result.length === 0) {
