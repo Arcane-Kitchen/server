@@ -7,17 +7,19 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "dotenvx run -- node --experimental-strip-types ./src/server.ts",
-    "dev": "dotenvx run -- npx nodemon ./src/server.ts"
+    "dev": "dotenvx run -- node --loader ts-node/esm --experimental-specifier-resolution=node ./src/server.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@dotenvx/dotenvx": "^1.38.3",
+    "@supabase/supabase-js": "^2.49.1",
     "cors": "^2.8.5",
     "express": "^4.21.2"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
     "@types/node": "^22.13.9",
     "nodemon": "^3.1.9",

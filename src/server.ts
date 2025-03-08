@@ -1,14 +1,18 @@
 import express from "express";
-import userRoutes from "./routes/userRoutes";
+import userRoutes from "./routes/userRoutes.ts";
 
-const cors = require("cors");
+import cors from "cors";
 const app = express();
 
 
 const PORT = process.env.PORT;
+const frontendUrl = process.env.FRONTEND_URL;
 
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+	origin: frontendUrl,
+  	credentials: true,
+}));
 
 // API Routes
 app.use("/users", userRoutes);
