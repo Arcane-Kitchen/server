@@ -4,6 +4,6 @@ import { getAllRecipes, getRecipeById } from "../controllers/recipeController"
 const router = express.Router();
 
 router.get("/", getAllRecipes);
-router.get("/recipes/:id", getRecipeById);
+router.get("/:id", getRecipeById);
 
 export default router;

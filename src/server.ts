@@ -15,7 +15,7 @@ app.use(cors({
 
 // API Routes
 app.use("/users", userRoutes);
-app.use("recipes", recipeRoutes);
+app.use("/recipes", recipeRoutes);
 
 app.listen(PORT, () => {
 	console.log(`Server running on port ${PORT}`);
