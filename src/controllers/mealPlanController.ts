@@ -82,7 +82,7 @@ export const addRecipeToMealPlan = async (req: Request, res: Response) => {
             return;
         }
     
-        const difficulty = recipe[0].difficulty;
+        const difficulty = recipe[0].difficulty.toLowerCase();
         const exp = setXPForRecipeDifficulty(difficulty);
 
         const recipeProps: recipe = {
