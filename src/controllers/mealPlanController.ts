@@ -77,12 +77,12 @@ export const addRecipeToMealPlan = async (req: Request, res: Response) => {
     try {
         // Check and fetch the recipe from the meal plan
         const recipe = await findById(recipeId, supabase);
-        if (!recipe || recipe.length === 0) {
+        if (!recipe) {
             res.status(404).json({ message: "Recipe not found" });
             return;
         }
     
-        const difficulty = recipe[0].difficulty.toLowerCase();
+        const difficulty = recipe.difficulty.toLowerCase();
         const exp = setXPForRecipeDifficulty(difficulty);
 
         const recipeProps: recipe = {

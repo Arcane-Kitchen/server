@@ -3,7 +3,9 @@ export const findById = async (recipeId:string, supabase:any) => {
     const { data, error } = await supabase
         .from("Recipe")
         .select()
-        .eq("id", recipeId);
+        .eq("id", recipeId)
+        .limit(1)
+        .single();
 
     if (error) {
         console.error("Error fetching recipe: ", error);
