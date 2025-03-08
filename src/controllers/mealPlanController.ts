@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { getMealPlan, addRecipe } from "../models/mealPlanModel.ts"
+import { getMealPlan, getRecipe, addRecipe, updateRecipe } from "../models/mealPlanModel.ts"
 import { findById } from "../models/recipeModel.ts"
 import getSupabaseClientWithAuth from "../utils/supabase.ts";
 import { setXPForRecipeDifficulty } from "../utils/xpHelper.ts";
@@ -59,8 +59,8 @@ export const getUserWeeklyMealPlan = async (req: Request, res: Response) => {
 
 // Add a recipe to the user's weekly meal plan
 export const addRecipeToMealPlan = async (req: Request, res: Response) => {
-    const { id, recipeId } = req.params;
-    const { dayToEat, servings, hasBeenEaten, chosenMealType } = req.body;
+    const { id } = req.params;
+    const { recipeId, dayToEat, servings, hasBeenEaten, chosenMealType } = req.body;
     const token = req.get("X-Supabase-Auth");
 
     // Token Validation
@@ -70,7 +70,7 @@ export const addRecipeToMealPlan = async (req: Request, res: Response) => {
     if (!supabase) return;
 
     // Validate required props
-    const requiredProps = ["dayToEat", "chosenMealType"];
+    const requiredProps = ["recipeId", "dayToEat", "chosenMealType"];
     if (!validateProps(req.body, requiredProps, res)) return;
 
 
@@ -90,15 +90,50 @@ export const addRecipeToMealPlan = async (req: Request, res: Response) => {
             "day_to_eat": dayToEat,
             exp,
             "chosen_meal_type": chosenMealType,
+            ...servings && {servings},
+            ...hasBeenEaten && { "has_been_eaten": hasBeenEaten },
         }
-
-        if (servings !== undefined) recipeProps.servings = servings;
-        if (hasBeenEaten !== undefined) recipeProps.has_been_eaten = hasBeenEaten;
 
         await addRecipe(recipeProps, supabase);
         res.status(201).json({ message: "New recipe added to meal plan successfully" });
 
     } catch (error: any) {
+        res.status(500).json({ error: error.message })
+    }
+}
+
+// Update a recipe in the user's meal plan
+export const updateRecipeInMealPlan = async (req: Request, res: Response) => {
+    const { mealPlanId } = req.params;
+    const { dayToEat, servings, hasBeenEaten, chosenMealType } = req.body;
+    const token = req.get("X-Supabase-Auth");
+
+    // Token Validation
+    if (!validateToken(token, res)) return;
+
+    const supabase = await getSupabaseClientWithAuth(token!, res);
+    if (!supabase) return;
+
+    try {
+        // Fetch the recipe from the meal
+        const recipe = await getRecipe(mealPlanId, supabase);
+        if (!recipe || recipe.length === 0) {
+            res.status(404).json({ message: "Recipe not found in the meal plan" });
+            return;
+        }
+
+        const recipeProps:Partial<recipe> = {
+            ...servings && {servings},
+            ...dayToEat && { "day_to_eat": dayToEat },
+            ...hasBeenEaten && { "has_been_eaten": hasBeenEaten },
+            ...chosenMealType && { "chosen_meal_type": chosenMealType }
+        };
+
+        // Update the recipe in the meal plan
+        await updateRecipe(mealPlanId, recipeProps, supabase);
+        res.status(200).json({ message: "Meal plan updated successfully" });
+
+    } catch (error:any) {
         res.status(500).json({ error: error.message })
     }
 }
