@@ -159,7 +159,7 @@ export const updateRecipeInMealPlan = async (req: Request, res: Response) => {
     const recipeProps: Partial<recipe> = {
       ...(servings && { servings }),
       ...(dayToEat && { day_to_eat: dayToEat }),
-      ...(hasBeenEaten && { has_been_eaten: hasBeenEaten }),
+      ...(hasBeenEaten !== undefined && { has_been_eaten: hasBeenEaten }),
       ...(chosenMealType && { chosen_meal_type: chosenMealType }),
     };
 

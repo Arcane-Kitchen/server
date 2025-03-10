@@ -64,7 +64,7 @@ export const updateRecipe = async (
   recipe: Partial<recipe>,
   supabase: any
 ) => {
-  const { data, error } = await supabase
+  const { error } = await supabase
     .from("User_Recipe")
     .update(recipe)
     .eq("id", mealPlanId);
@@ -72,8 +72,6 @@ export const updateRecipe = async (
   if (error) {
     throw new Error(error.message);
   }
-
-  return data;
 };
 
 export const deleteRecipe = async (mealPlanId: string, supabase: any) => {
