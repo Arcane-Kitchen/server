@@ -1,4 +1,4 @@
-import { recipe } from "../controllers/mealPlanController";
+import { recipe } from "../controllers/mealPlanController.js";
 
 // Fetch meal plan from Supabase by user Id
 export const getMealPlan = async (
