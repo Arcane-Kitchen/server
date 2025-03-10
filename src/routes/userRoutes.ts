@@ -2,14 +2,14 @@ import express from "express";
 import {
   createNewUser,
   findUserBySupabaseId,
-} from "../controllers/userController.ts";
+} from "../controllers/userController.js";
 import {
   getUserWeeklyMealPlan,
   addRecipeToMealPlan,
   updateRecipeInMealPlan,
   removeRecipeFromMealPlan,
   getUserFullMealPlan,
-} from "../controllers/mealPlanController.ts";
+} from "../controllers/mealPlanController.js";
 
 const router = express.Router();
 

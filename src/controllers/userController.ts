@@ -1,53 +1,59 @@
-import { Request, Response } from 'express';
-import { create, findById } from "../models/userModel.ts";
-import getSupabaseClientWithAuth from "../utils/supabase.ts";
-import { validateToken, validateProps } from "../utils/validation.ts"
+import { Request, Response } from "express";
+import { create, findById } from "../models/userModel.js";
+import getSupabaseClientWithAuth from "../utils/supabase.js";
+import { validateToken, validateProps } from "../utils/validation.js";
 
 // create a new user
-export const createNewUser = async (req: Request, res: Response): Promise<void> => {
-    const { supabaseId, username } = req.body;
-    const token = req.get("X-Supabase-Auth");
+export const createNewUser = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const { supabaseId, username } = req.body;
+  const token = req.get("X-Supabase-Auth");
 
-    // Token Validation
-    if (!validateToken(token, res)) return;
-    
-    const supabase = await getSupabaseClientWithAuth(token!, res);
-    if (!supabase) return;
+  // Token Validation
+  if (!validateToken(token, res)) return;
 
-    // Validate required props
-    const requiredProps = ["supabaseId", "username"];
-    if (!validateProps(req.body, requiredProps, res)) return;
+  const supabase = await getSupabaseClientWithAuth(token!, res);
+  if (!supabase) return;
 
-    try {
-        await create({ "supabase_id": supabaseId, username }, supabase);
-        res.status(201).json({ message: "New user added successfully" });
-    } catch (error:any) {
-        res.status(500).json({ error: error.message })
-    }
-}
+  // Validate required props
+  const requiredProps = ["supabaseId", "username"];
+  if (!validateProps(req.body, requiredProps, res)) return;
+
+  try {
+    await create({ supabase_id: supabaseId, username }, supabase);
+    res.status(201).json({ message: "New user added successfully" });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+};
 
 // Find a user by Supabase Id
-export const findUserBySupabaseId = async (req: Request, res: Response): Promise<void> => {
-    const { id } = req.params;
-    const token = req.get("X-Supabase-Auth");
+export const findUserBySupabaseId = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const { id } = req.params;
+  const token = req.get("X-Supabase-Auth");
 
-    // Token validation
-    if (!validateToken(token, res)) return;
+  // Token validation
+  if (!validateToken(token, res)) return;
 
-    const supabase = await getSupabaseClientWithAuth(token!, res);
-    if (!supabase) return;
+  const supabase = await getSupabaseClientWithAuth(token!, res);
+  if (!supabase) return;
 
-    try {        
-        const result = await findById(id, supabase);
-    
-        if (!result || result.length === 0) {
-            res.status(404).json({ message: "User not found" });
-            return;
-        }
-    
-        const userProfile = result[0];
-        res.status(200).json(userProfile);
-    } catch (error:any) {
-        res.status(500).json({ error: error.message });
+  try {
+    const result = await findById(id, supabase);
+
+    if (!result || result.length === 0) {
+      res.status(404).json({ message: "User not found" });
+      return;
     }
-}
+
+    const userProfile = result[0];
+    res.status(200).json(userProfile);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+};

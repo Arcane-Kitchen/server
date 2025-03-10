@@ -6,11 +6,11 @@ import {
   updateRecipe,
   deleteRecipe,
   getFullMealPlan,
-} from "../models/mealPlanModel.ts";
-import { findById } from "../models/recipeModel.ts";
-import getSupabaseClientWithAuth from "../utils/supabase.ts";
-import { setXPForRecipeDifficulty } from "../utils/xpHelper.ts";
-import { validateToken, validateProps } from "../utils/validation.ts";
+} from "../models/mealPlanModel.js";
+import { findById } from "../models/recipeModel.js";
+import getSupabaseClientWithAuth from "../utils/supabase.js";
+import { setXPForRecipeDifficulty } from "../utils/xpHelper.js";
+import { validateToken, validateProps } from "../utils/validation.js";
 
 // Format date to YYYY-MM-DD
 const formatDate = (date: Date) => {
