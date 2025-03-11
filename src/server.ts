@@ -3,7 +3,7 @@ import cors from "cors";
 import userRoutes from "./routes/userRoutes.ts";
 import recipeRoutes from "./routes/recipeRoutes.ts";
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 8080;
 const frontendUrl = process.env.FRONTEND_URL;
 
 const app = express();
