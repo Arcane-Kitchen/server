@@ -1,24 +1,18 @@
 import { Request, Response } from "express";
 import {
-  getMealPlan,
+  getWeeklyMealPlan,
   getRecipe,
   addRecipe,
-  updateRecipe,
+  updateMealPlan,
   deleteRecipe,
   getFullMealPlan,
+  getById,
+  getByDateAndMealType,
 } from "../models/mealPlanModel.js";
 import { findById } from "../models/recipeModel.js";
 import getSupabaseClientWithAuth from "../utils/supabase.js";
 import { setXPForRecipeDifficulty } from "../utils/xpHelper.js";
 import { validateToken, validateProps } from "../utils/validation.js";
-
-// Format date to YYYY-MM-DD
-const formatDate = (date: Date) => {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-};
 
 // Define the recipe interface
 export interface recipe {
@@ -32,8 +26,9 @@ export interface recipe {
 }
 
 // Fetch the user's meal plan for the week
-export const getUserWeeklyMealPlan = async (req: Request, res: Response) => {
+export const getUserMealPlan = async (req: Request, res: Response) => {
   const { id } = req.params;
+  const { "start-date": startDate, "end-date": endDate } = req.query;
   const token = req.get("X-Supabase-Auth");
 
   // Token validation
@@ -43,45 +38,24 @@ export const getUserWeeklyMealPlan = async (req: Request, res: Response) => {
   if (!supabase) return;
 
   try {
-    // calculate the start and end of the weekly meal plan
-    const currentDate = new Date();
-    const currentDay = currentDate.getDay();
+    // If both start-date and end-date are provided, fetch the weekly meal plan
+    if (startDate && endDate) {
+      if (typeof startDate !== "string" || typeof endDate !== "string") {
+        res.status(400).json({ message: "Invalid date." });
+        return;
+      }
+       // Fetch the user's weekly meal plan
+      const results = await getWeeklyMealPlan(
+        id,
+        startDate,
+        endDate,
+        supabase
+      );
+      res.status(200).json(results);
+      return;
+    }
 
-    const startOfWeek = new Date();
-    startOfWeek.setDate(currentDate.getDate() - currentDay);
-
-    const endOfWeek = new Date(startOfWeek);
-    endOfWeek.setDate(startOfWeek.getDate() + 6);
-
-    const formattedStartOfWeek = formatDate(startOfWeek);
-    const formattedEndOfWeek = formatDate(endOfWeek);
-
-    // Fetch the user's meal plan
-    const results = await getMealPlan(
-      id,
-      formattedStartOfWeek,
-      formattedEndOfWeek,
-      supabase
-    );
-    res.status(200).json(results);
-  } catch (error: any) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-// Fetch the user's meal plan for the week
-export const getUserFullMealPlan = async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const token = req.get("X-Supabase-Auth");
-
-  // Token validation
-  if (!validateToken(token, res)) return;
-
-  const supabase = await getSupabaseClientWithAuth(token!, res);
-  if (!supabase) return;
-
-  try {
-    // Fetch the user's full meal plan
+    // If no start-date or end-date, fetch the full meal plan
     const results = await getFullMealPlan(id, supabase);
     res.status(200).json(results);
   } catch (error: any) {
@@ -136,8 +110,8 @@ export const addRecipeToMealPlan = async (req: Request, res: Response) => {
   }
 };
 
-// Update a recipe in the user's meal plan
-export const updateRecipeInMealPlan = async (req: Request, res: Response) => {
+// Update a recipe in the user's meal plan by meal plan Id
+export const updateRecipeInMealPlanById = async (req: Request, res: Response) => {
   const { mealPlanId } = req.params;
   const { dayToEat, servings, hasBeenEaten, chosenMealType } = req.body;
   const token = req.get("X-Supabase-Auth");
@@ -149,10 +123,10 @@ export const updateRecipeInMealPlan = async (req: Request, res: Response) => {
   if (!supabase) return;
 
   try {
-    // Check if the recipe exists in the meal plan
-    const recipe = await getRecipe(mealPlanId, supabase);
-    if (!recipe || recipe.length === 0) {
-      res.status(404).json({ message: "Recipe not found in the meal plan" });
+    // Check if the the meal plan exists
+    const mealPlan = await getById(mealPlanId, supabase);
+    if (!mealPlan || mealPlan.length === 0) {
+      res.status(404).json({ message: "Meal plan not found" });
       return;
     }
 
@@ -164,7 +138,72 @@ export const updateRecipeInMealPlan = async (req: Request, res: Response) => {
     };
 
     // Update the recipe in the meal plan
-    await updateRecipe(mealPlanId, recipeProps, supabase);
+    await updateMealPlan(mealPlanId, recipeProps, supabase);
+    res.status(200).json({ message: "Meal plan updated successfully" });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Update a recipe in the user's meal plan by date and meal type
+export const updateRecipeInMealPlanByDateAndMealType = async (req: Request, res: Response) => {
+  const { date, "meal-type" : mealType } = req.query;
+  const { recipeId, servings } = req.body;
+  const token = req.get("X-Supabase-Auth");
+
+  // Token Validation
+  if (!validateToken(token, res)) return;
+
+  const supabase = await getSupabaseClientWithAuth(token!, res);
+  if (!supabase) return;
+
+  // Validate required props
+  const requiredProps = ["recipeId"];
+  if (!validateProps(req.body, requiredProps, res)) return;
+
+  try {
+
+    if (typeof date !== "string" || typeof mealType !== "string") {
+      res.status(400).json({ message: "Invalid date or meal type." });
+      return;
+    }
+
+    const currentDate = new Date();
+    currentDate.setHours(0, 0, 0, 0);
+
+    const mealDate = new Date(date);
+
+    // Reject the update if the meal date has already passed
+    if (mealDate < currentDate) {
+      res.status(400).json({ message: "Cannot update meal plan for past dates." });
+      return;
+    }
+
+    // Check if the the meal plan exists
+    const mealPlan = await getByDateAndMealType(date, mealType, supabase);
+    if (!mealPlan || mealPlan.length === 0) {
+      res.status(404).json({ message: "Meal plan not found" });
+      return;
+    }
+
+    // Check and fetch the recipe from the meal plan
+    const recipe = await findById(recipeId, supabase);
+    if (!recipe) {
+      res.status(404).json({ message: "Recipe not found" });
+      return;
+    }
+
+    const difficulty = recipe.difficulty.toLowerCase();
+    const exp = setXPForRecipeDifficulty(difficulty);
+
+    const recipeProps: Partial<recipe> = {
+      ...(servings && { servings }),
+      recipe_id: recipeId,
+      exp,
+    }
+
+    // Update the recipe in the meal plan
+    await updateMealPlan(mealPlan.id, recipeProps, supabase);
     res.status(200).json({ message: "Meal plan updated successfully" });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
