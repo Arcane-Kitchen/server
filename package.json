@@ -6,9 +6,9 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "tsc": "tsc",
-    "build": "npm run tsc",
-    "start": "node ./src/server.js",
+    "build": "tsc",
+    "postinstall": "npm run build",
+    "start": "node dist/server.js",
     "dev": "dotenvx run -- node --loader ts-node/esm --experimental-specifier-resolution=node ./src/server.ts"
   },
   "keywords": [],
@@ -19,15 +19,13 @@
     "@supabase/supabase-js": "^2.49.1",
     "cors": "^2.8.5",
     "express": "^4.21.2",
-    "node-fetch": "^3.3.2"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.2"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
     "@types/node": "^22.13.9",
-    "@types/node-fetch": "^2.6.12",
-    "nodemon": "^3.1.9",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.8.2"
+    "nodemon": "^3.1.9"
   }
 }

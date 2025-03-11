@@ -1,7 +1,43 @@
-import { recipe } from "../controllers/mealPlanController";
+import { recipe } from "../controllers/mealPlanController.js";
 
-// Fetch meal plan from Supabase by user Id
-export const getMealPlan = async (
+// Fetch meal plan by meal plan Id
+export const getById = async (
+  mealPlanId: string, 
+  supabase: any
+) => {
+  const { data, error } = await supabase
+    .from("User_Recipe")
+    .select()
+    .eq("id", mealPlanId)
+
+  if (error) {
+    console.error("Error fetching meal plan: ", error);
+  }
+
+  return data;
+};
+
+// Fetch meal plan by meal plan by date and meal type
+export const getByDateAndMealType = async (
+  date: string,
+  mealType: string,
+  supabase: any
+) => {
+  const { data, error } = await supabase
+    .from("User_Recipe")
+    .select()
+    .eq("day_to_eat", date)
+    .eq("chosen_meal_type", mealType)
+
+  if (error) {
+    console.error("Error fetching meal plan: ", error);
+  }
+
+  return data;
+};
+
+// Fetch weekly meal plan from Supabase by user Id
+export const getWeeklyMealPlan = async (
   userId: string,
   start: string,
   end: string,
@@ -21,7 +57,7 @@ export const getMealPlan = async (
   return data;
 };
 
-// Fetch meal plan from Supabase by user Id
+// Fetch all meal plan from Supabase by user Id
 export const getFullMealPlan = async (userId: string, supabase: any) => {
   const { data, error } = await supabase
     .from("User_Recipe")
@@ -59,12 +95,12 @@ export const addRecipe = async (recipe: recipe, supabase: any) => {
   return data;
 };
 
-export const updateRecipe = async (
+export const updateMealPlan = async (
   mealPlanId: string,
   recipe: Partial<recipe>,
   supabase: any
 ) => {
-  const { data, error } = await supabase
+  const { error } = await supabase
     .from("User_Recipe")
     .update(recipe)
     .eq("id", mealPlanId);
@@ -72,8 +108,6 @@ export const updateRecipe = async (
   if (error) {
     throw new Error(error.message);
   }
-
-  return data;
 };
 
 export const deleteRecipe = async (mealPlanId: string, supabase: any) => {
