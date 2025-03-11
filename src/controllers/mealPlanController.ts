@@ -80,6 +80,18 @@ export const addRecipeToMealPlan = async (req: Request, res: Response) => {
   const requiredProps = ["recipeId", "dayToEat", "chosenMealType"];
   if (!validateProps(req.body, requiredProps, res)) return;
 
+  const currentDate = new Date();
+  currentDate.setHours(0, 0, 0, 0);
+
+  const mealDate = new Date(dayToEat);
+  mealDate.setHours(0, 0, 0, 0);
+
+  // Reject adding recipe if the meal date has already passed
+  if (mealDate < currentDate) {
+    res.status(400).json({ message: "Cannot add recipe for past dates." });
+    return;
+  }
+
   try {
     // Check and fetch the recipe from the meal plan
     const recipe = await findById(recipeId, supabase);
@@ -94,7 +106,7 @@ export const addRecipeToMealPlan = async (req: Request, res: Response) => {
     const recipeProps: recipe = {
       user_id: id,
       recipe_id: recipeId,
-      day_to_eat: dayToEat,
+      day_to_eat: mealDate.toISOString(),
       exp,
       chosen_meal_type: chosenMealType,
       ...(servings && { servings }),
@@ -173,6 +185,7 @@ export const updateRecipeInMealPlanByDateAndMealType = async (req: Request, res:
     currentDate.setHours(0, 0, 0, 0);
 
     const mealDate = new Date(date);
+    mealDate.setHours(0, 0, 0, 0);
 
     // Reject the update if the meal date has already passed
     if (mealDate < currentDate) {
