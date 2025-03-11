@@ -30,6 +30,7 @@ const getSupabaseClientWithAuth = async (token: string, res: Response) => {
   return supabase;
 };
 
+// ! this should only be used for absolutely necessary server side use !
 export const getSupabaseAdminClient = async () => {
   // Create the Supabase admin client
   const supabase = createClient(supabaseUrl, serviceRoleKey);

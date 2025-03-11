@@ -17,7 +17,8 @@ app.use(
   })
 );
 
-schedule.scheduleJob("*/10 * * * * *", async () => {
+// updates users pet stats every day at midnight
+schedule.scheduleJob("0 0 * * *", async () => {
   petStatsCalc();
 });
 
