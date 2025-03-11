@@ -8,5 +8,6 @@ const router = express.Router();
 
 router.get("/", getAllRecipes);
 router.get("/:id", getRecipeById);
+router.post("/", addRecipe);
 
 export default router;
