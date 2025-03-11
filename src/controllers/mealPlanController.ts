@@ -147,6 +147,7 @@ export const updateRecipeInMealPlanById = async (req: Request, res: Response) =>
 
 // Update a recipe in the user's meal plan by date and meal type
 export const updateRecipeInMealPlanByDateAndMealType = async (req: Request, res: Response) => {
+  const { id } = req.params;
   const { date, "meal-type" : mealType } = req.query;
   const { recipeId, servings } = req.body;
   const token = req.get("X-Supabase-Auth");
@@ -180,8 +181,8 @@ export const updateRecipeInMealPlanByDateAndMealType = async (req: Request, res:
     }
 
     // Check if the the meal plan exists
-    const mealPlan = await getByDateAndMealType(date, mealType, supabase);
-    if (!mealPlan || mealPlan.length === 0) {
+    const mealPlan = await getByDateAndMealType(id, date, mealType, supabase);
+    if (!mealPlan) {
       res.status(404).json({ message: "Meal plan not found" });
       return;
     }

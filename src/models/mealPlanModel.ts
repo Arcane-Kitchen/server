@@ -19,6 +19,7 @@ export const getById = async (
 
 // Fetch meal plan by meal plan by date and meal type
 export const getByDateAndMealType = async (
+  userId: string,
   date: string,
   mealType: string,
   supabase: any
@@ -26,8 +27,10 @@ export const getByDateAndMealType = async (
   const { data, error } = await supabase
     .from("User_Recipe")
     .select()
+    .eq("user_id", userId)
     .eq("day_to_eat", date)
     .eq("chosen_meal_type", mealType)
+    .single()
 
   if (error) {
     console.error("Error fetching meal plan: ", error);
@@ -100,6 +103,7 @@ export const updateMealPlan = async (
   recipe: Partial<recipe>,
   supabase: any
 ) => {
+
   const { error } = await supabase
     .from("User_Recipe")
     .update(recipe)
