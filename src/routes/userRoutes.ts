@@ -4,12 +4,11 @@ import {
   findUserBySupabaseId,
 } from "../controllers/userController.js";
 import {
-  getUserWeeklyMealPlan,
   addRecipeToMealPlan,
   updateRecipeInMealPlanById,
   removeRecipeFromMealPlan,
-  getUserFullMealPlan,
-  updateRecipeInMealPlanByDateAndMealType
+  updateRecipeInMealPlanByDateAndMealType,
+  getUserMealPlan
 } from "../controllers/mealPlanController.js";
 
 const router = express.Router();
@@ -19,8 +18,7 @@ router.post("/", createNewUser);
 router.get("/:id", findUserBySupabaseId);
 
 //meal plan-related methods
-router.get("/:id/full-meal-plan", getUserFullMealPlan);
-router.get("/:id/meal-plan", getUserWeeklyMealPlan);
+router.get("/:id/meal-plan", getUserMealPlan); // meal-plan?start-date=<date>&end-date=<date>
 router.post("/:id/meal-plan", addRecipeToMealPlan);
 router.patch("/:id/meal-plan/:mealPlanId", updateRecipeInMealPlanById);
 router.patch("/:id/meal-plan", updateRecipeInMealPlanByDateAndMealType); // meal-plan?date=<date>&meal-type=<meal-type>
