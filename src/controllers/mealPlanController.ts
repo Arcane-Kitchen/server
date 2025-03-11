@@ -14,14 +14,6 @@ import getSupabaseClientWithAuth from "../utils/supabase.js";
 import { setXPForRecipeDifficulty } from "../utils/xpHelper.js";
 import { validateToken, validateProps } from "../utils/validation.js";
 
-// Format date to YYYY-MM-DD
-const formatDate = (date: Date) => {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-};
-
 // Define the recipe interface
 export interface recipe {
   user_id: string;
@@ -34,8 +26,9 @@ export interface recipe {
 }
 
 // Fetch the user's meal plan for the week
-export const getUserWeeklyMealPlan = async (req: Request, res: Response) => {
+export const getUserMealPlan = async (req: Request, res: Response) => {
   const { id } = req.params;
+  const { "start-date": startDate, "end-date": endDate } = req.query;
   const token = req.get("X-Supabase-Auth");
 
   // Token validation
@@ -45,45 +38,24 @@ export const getUserWeeklyMealPlan = async (req: Request, res: Response) => {
   if (!supabase) return;
 
   try {
-    // calculate the start and end of the weekly meal plan
-    const currentDate = new Date();
-    const currentDay = currentDate.getDay();
+    // If both start-date and end-date are provided, fetch the weekly meal plan
+    if (startDate && endDate) {
+      if (typeof startDate !== "string" || typeof endDate !== "string") {
+        res.status(400).json({ message: "Invalid date." });
+        return;
+      }
+       // Fetch the user's weekly meal plan
+      const results = await getWeeklyMealPlan(
+        id,
+        startDate,
+        endDate,
+        supabase
+      );
+      res.status(200).json(results);
+      return;
+    }
 
-    const startOfWeek = new Date();
-    startOfWeek.setDate(currentDate.getDate() - currentDay);
-
-    const endOfWeek = new Date(startOfWeek);
-    endOfWeek.setDate(startOfWeek.getDate() + 6);
-
-    const formattedStartOfWeek = formatDate(startOfWeek);
-    const formattedEndOfWeek = formatDate(endOfWeek);
-
-    // Fetch the user's meal plan
-    const results = await getWeeklyMealPlan(
-      id,
-      formattedStartOfWeek,
-      formattedEndOfWeek,
-      supabase
-    );
-    res.status(200).json(results);
-  } catch (error: any) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-// Fetch the user's meal plan for the week
-export const getUserFullMealPlan = async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const token = req.get("X-Supabase-Auth");
-
-  // Token validation
-  if (!validateToken(token, res)) return;
-
-  const supabase = await getSupabaseClientWithAuth(token!, res);
-  if (!supabase) return;
-
-  try {
-    // Fetch the user's full meal plan
+    // If no start-date or end-date, fetch the full meal plan
     const results = await getFullMealPlan(id, supabase);
     res.status(200).json(results);
   } catch (error: any) {
