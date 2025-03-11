@@ -2,6 +2,7 @@ import express from "express";
 import {
   getAllRecipes,
   getRecipeById,
+  addRecipe,
 } from "../controllers/recipeController.js";
 
 const router = express.Router();
