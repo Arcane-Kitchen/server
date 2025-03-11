@@ -62,15 +62,15 @@ export const getNutritionFromId = async (recipeId: number, supabase: any) => {
   }
 
   return data;
-}
-  // Add a new recipe to the database
-  export const addRecipe = async (recipeData: any, supabase: any) => {
-    const { data, error } = await supabase.from("Recipe").insert(recipeData);
+};
 
-    if (error) {
-      throw new Error(error.message);
-    }
+// Add a new recipe to the database
+export const addRecipe = async (recipeData: any, supabase: any) => {
+  const { data, error } = await supabase.from("Recipe").insert(recipeData);
 
-    return data;
-  };
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data;
 };
