@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { createClient } from "@supabase/supabase-js";
-import { getAll, findById, addRecipe as addRecipeToDb } from "../models/recipeModel";
+import { getAll, findById, addRecipe as addRecipeToDb } from "../models/recipeModel.js";
 
 const supabaseUrl = process.env.SUPABASE_URL as string;
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY as string;
@@ -39,6 +39,18 @@ export const getRecipeById = async (req: Request, res: Response) => {
 
     res.status(200).json(recipe);
   } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Add a new recipe to the database
+export const addRecipe = async (req: Request, res: Response) => {
+  const recipeData = req.body;
+  try {
+    const newRecipe = await addRecipeToDb(recipeData, supabase);
+    res.status(201).json(newRecipe);
+  } catch (error: any) {
+    console.error("Error adding recipe:", error); // Log the error
     res.status(500).json({ error: error.message });
   }
 };
