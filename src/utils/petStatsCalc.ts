@@ -130,6 +130,5 @@ export const petStatsCalc = async () => {
       proteinPoints,
       newSupabase
     );
-    console.log(updatePointsStatus);
   }
 };
