@@ -6,15 +6,23 @@ import schedule from "node-schedule";
 import { petStatsCalc } from "./utils/petStatsCalc.js";
 
 const PORT = process.env.PORT;
-const frontendUrl = process.env.FRONTEND_URL;
 
 const app = express();
 app.use(express.json());
 
+const allowedOrigins = process.env.FRONTEND_URL
+  ? process.env.FRONTEND_URL.split(",")
+  : [];
+
 app.use(
   cors({
-    origin: frontendUrl,
-    credentials: true,
+    origin: (origin, callback) => {
+      if (origin && allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
   })
 );
 
