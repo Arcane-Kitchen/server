@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import userRoutes from "./routes/userRoutes.js";
 import recipeRoutes from "./routes/recipeRoutes.js";
+import imageRoutes from "./routes/imageRoutes.js"; // Import the new image routes
 import schedule from "node-schedule";
 import { petStatsCalc } from "./utils/petStatsCalc.js";
 
@@ -25,6 +26,7 @@ schedule.scheduleJob("0 0 * * *", async () => {
 // API Routes
 app.use("/users", userRoutes);
 app.use("/recipes", recipeRoutes);
+app.use("/image", imageRoutes); // Use the new image routes
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
