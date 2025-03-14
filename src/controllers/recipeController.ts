@@ -1,6 +1,10 @@
 import { Request, Response } from "express";
 import { createClient } from "@supabase/supabase-js";
-import { getAll, findById, addRecipe as addRecipeToDb } from "../models/recipeModel.js";
+import {
+  getAll,
+  findById,
+  addRecipe as addRecipeToDb,
+} from "../models/recipeModel.js";
 
 const supabaseUrl = process.env.SUPABASE_URL as string;
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY as string;
@@ -54,3 +58,22 @@ export const addRecipe = async (req: Request, res: Response) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+// get all recipes eaten in the past day
+// export const getAllRecipesEatenPastDay = async (
+//   req: Request,
+//   res: Response
+// ): Promise<void> => {
+//   try {
+//     const recipes = await getRecipesEatenPastDay(supabase);
+
+//     if (!recipes || recipes.length === 0) {
+//       res.status(404).json({ message: "No recipes found" });
+//       return;
+//     }
+
+//     res.status(200).json(recipes);
+//   } catch (error: any) {
+//     res.status(500).json({ error: error.message });
+//   }
+// };

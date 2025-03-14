@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { create, findById } from "../models/userModel.js";
+import { create, findById, updateLastLogin } from "../models/userModel.js";
 import getSupabaseClientWithAuth from "../utils/supabase.js";
 import { validateToken, validateProps } from "../utils/validation.js";
 
@@ -53,6 +53,28 @@ export const findUserBySupabaseId = async (
 
     const userProfile = result[0];
     res.status(200).json(userProfile);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// update last user login date
+export const updateUserLastLogin = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const idToNum = Number(id);
+  const { date } = req.body;
+  const token = req.get("X-Supabase-Auth");
+
+  // Token validation
+  if (!validateToken(token, res)) return;
+
+  const supabase = await getSupabaseClientWithAuth(token!, res);
+  if (!supabase) return;
+
+  try {
+    await updateLastLogin(idToNum, date, supabase);
+
+    res.status(200).json({ message: "Login date updated successfully" });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }

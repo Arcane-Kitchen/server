@@ -27,7 +27,7 @@ export const getAll = async (supabase: any) => {
 };
 
 // get recipes for pet stat calculation per user
-export const getRecipesForPetCalc = async (
+export const getRecipesEatenPastDay = async (
   userId: number,
   supabase: any,
   pastDay: string,
