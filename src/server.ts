@@ -29,9 +29,9 @@ app.use(
 );
 
 // updates users pet stats every day at midnight
-schedule.scheduleJob("0 0 * * *", async () => {
-  petStatsCalc();
-});
+// schedule.scheduleJob("0 0 * * *", async () => {
+//   petStatsCalc();
+// });
 
 // API Routes
 app.use("/users", userRoutes);
