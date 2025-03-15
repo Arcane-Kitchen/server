@@ -41,3 +41,16 @@ export const addAchievementToDb = async (userId: string, achievement: string) =>
 
   return data;
 };
+
+export const getUserAchievements = async (userId: string) => {
+  const { data, error } = await supabase
+    .from('User_Achievements')
+    .select('*')
+    .eq('user_id', userId);
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+};

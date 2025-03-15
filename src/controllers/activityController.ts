@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { addActivityToDb, getActivityCount, addAchievementToDb } from "../models/activityModel.js";
+import { addActivityToDb, getActivityCount, addAchievementToDb, getUserAchievements } from "../models/activityModel.js";
 
 export const addActivity = async (req: Request, res: Response): Promise<void> => {
   const { userId, recipeId } = req.body;
@@ -27,5 +27,22 @@ export const addActivity = async (req: Request, res: Response): Promise<void> =>
   } catch (error) {
     console.error('Error adding activity:', error);
     res.status(500).json({ error: 'Failed to add activity' });
+  }
+};
+
+export const fetchUserAchievements = async (req: Request, res: Response): Promise<void> => {
+  const { userId } = req.params;
+
+  if (!userId) {
+    res.status(400).json({ error: 'User ID is required' });
+    return;
+  }
+
+  try {
+    const achievements = await getUserAchievements(userId);
+    res.status(200).json(achievements);
+  } catch (error) {
+    console.error('Error fetching achievements:', error);
+    res.status(500).json({ error: 'Failed to fetch achievements' });
   }
 };

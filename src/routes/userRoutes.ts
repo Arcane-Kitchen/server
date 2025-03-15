@@ -11,7 +11,6 @@ import {
   updateRecipeInMealPlanByDateAndMealType,
   getUserMealPlan,
 } from "../controllers/mealPlanController.js";
-import { addActivity } from "../utils/achievement.js";
 
 const router = express.Router();
 
