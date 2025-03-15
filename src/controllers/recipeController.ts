@@ -1,6 +1,10 @@
 import { Request, Response } from "express";
 import { createClient } from "@supabase/supabase-js";
-import { getAll, findById, addRecipe as addRecipeToDb } from "../models/recipeModel.js";
+import {
+  getAll,
+  findById,
+  addRecipe as addRecipeToDb,
+} from "../models/recipeModel.js";
 
 const supabaseUrl = process.env.SUPABASE_URL as string;
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY as string;
