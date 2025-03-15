@@ -1,6 +1,6 @@
 import {
   getNutritionFromId,
-  getRecipesForPetCalc,
+  getRecipesEatenPastDay,
 } from "../models/recipeModel.js";
 import { getAllUserData, updateUserPetPoints } from "../models/userModel.js";
 import { getSupabaseAdminClient } from "./supabase.js";
