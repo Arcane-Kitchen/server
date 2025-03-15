@@ -65,3 +65,24 @@ export const updateUserPetPoints = async (
     return "success";
   }
 };
+
+// update user login date
+export const updateLastLogin = async (
+  userId: number,
+  date: string,
+  supabase: any
+) => {
+  const { error } = await supabase
+    .from("User")
+    .update({
+      updated_at: date,
+    })
+    .eq("id", userId);
+
+  if (error) {
+    console.error("Error updating last login: ", error);
+    return null;
+  } else {
+    return "success";
+  }
+};
