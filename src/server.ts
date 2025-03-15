@@ -3,7 +3,6 @@ import cors from "cors";
 import userRoutes from "./routes/userRoutes.js";
 import recipeRoutes from "./routes/recipeRoutes.js";
 import schedule from "node-schedule";
-import { petStatsCalc } from "./utils/petStatsCalc.js";
 
 const PORT = process.env.PORT;
 
