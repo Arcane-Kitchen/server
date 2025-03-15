@@ -8,7 +8,6 @@ import {
   addRecipeToMealPlan,
   updateRecipeInMealPlanById,
   removeRecipeFromMealPlan,
-  updateRecipeInMealPlanByDateAndMealType,
   getUserMealPlan,
 } from "../controllers/mealPlanController.js";
 
@@ -23,7 +22,6 @@ router.patch("/:id/login", updateUserLastLogin);
 router.get("/:id/meal-plan", getUserMealPlan); // meal-plan?start-date=<date>&end-date=<date>
 router.post("/:id/meal-plan", addRecipeToMealPlan);
 router.patch("/:id/meal-plan/:mealPlanId", updateRecipeInMealPlanById);
-router.patch("/:id/meal-plan", updateRecipeInMealPlanByDateAndMealType); // meal-plan?date=<date>&meal-type=<meal-type>
 router.delete("/:id/meal-plan/:mealPlanId", removeRecipeFromMealPlan);
 
 export default router;
