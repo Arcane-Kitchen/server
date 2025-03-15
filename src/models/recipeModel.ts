@@ -26,29 +26,6 @@ export const getAll = async (supabase: any) => {
   return data;
 };
 
-// get recipes for pet stat calculation per user
-export const getRecipesEatenPastDay = async (
-  userId: number,
-  supabase: any,
-  pastDay: string,
-  currentDay: string
-) => {
-  const { data, error } = await supabase
-    .from("User_Recipe")
-    .select()
-    .gt("day_to_eat", pastDay)
-    .lt("day_to_eat", currentDay)
-    .eq("has_been_eaten", true)
-    .eq("user_id", userId);
-
-  if (error) {
-    console.error("Error fetching all recipes: ", error);
-    return null;
-  }
-
-  return data;
-};
-
 // get nutrition info for specific recipe id
 export const getNutritionFromId = async (recipeId: number, supabase: any) => {
   const { data, error } = await supabase
