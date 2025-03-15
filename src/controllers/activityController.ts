@@ -4,8 +4,8 @@ import { addActivityToDb, getActivityCount, addAchievementToDb, getUserAchieveme
 export const addActivity = async (req: Request, res: Response): Promise<void> => {
   const { userId, recipeId } = req.body;
 
-  if (!userId || !recipeId) {
-    res.status(400).json({ error: 'User ID and Recipe ID are required' });
+  if (typeof userId !== 'number' || typeof recipeId !== 'number') {
+    res.status(400).json({ error: 'User ID and Recipe ID must be numbers' });
     return;
   }
 
@@ -17,24 +17,28 @@ export const addActivity = async (req: Request, res: Response): Promise<void> =>
     const activityCount = await getActivityCount(userId);
 
     if (activityCount.length === 1) {
-      // Save achievement to user_achievement table
-      await addAchievementToDb(userId, 'First Recipe Added');
+      // Save achievement to user_achievement table with reward_id 7
+      await addAchievementToDb(userId, 7);
       res.status(200).json({ message: 'Achievement unlocked: First Recipe Added' });
       return;
     }
 
     res.status(200).json({ message: 'Activity added successfully' });
   } catch (error) {
-    console.error('Error adding activity:', error);
+    if (error instanceof Error) {
+      console.error('Error adding activity:', error.message);
+    } else {
+      console.error('Error adding activity:', error);
+    }
     res.status(500).json({ error: 'Failed to add activity' });
   }
 };
 
 export const fetchUserAchievements = async (req: Request, res: Response): Promise<void> => {
-  const { userId } = req.params;
+  const userId = parseInt(req.params.userId, 10);
 
-  if (!userId) {
-    res.status(400).json({ error: 'User ID is required' });
+  if (isNaN(userId)) {
+    res.status(400).json({ error: 'User ID must be a number' });
     return;
   }
 
@@ -42,7 +46,11 @@ export const fetchUserAchievements = async (req: Request, res: Response): Promis
     const achievements = await getUserAchievements(userId);
     res.status(200).json(achievements);
   } catch (error) {
-    console.error('Error fetching achievements:', error);
+    if (error instanceof Error) {
+      console.error('Error fetching achievements:', error.message);
+    } else {
+      console.error('Error fetching achievements:', error);
+    }
     res.status(500).json({ error: 'Failed to fetch achievements' });
   }
 };
