@@ -1,5 +1,10 @@
 import { Request, Response } from "express";
-import { create, findById, updateLastLogin } from "../models/userModel.js";
+import {
+  create,
+  findById,
+  updateLastLogin,
+  updateUserStat,
+} from "../models/userModel.js";
 import getSupabaseClientWithAuth from "../utils/supabase.js";
 import { validateToken, validateProps } from "../utils/validation.js";
 
@@ -75,6 +80,33 @@ export const updateUserLastLogin = async (req: Request, res: Response) => {
     await updateLastLogin(idToNum, date, supabase);
 
     res.status(200).json({ message: "Login date updated successfully" });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// update user stat by certain amount
+export const updateUserStatController = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const idToNum = Number(id);
+  const { statAmount, chosenStat } = req.body;
+  const token = req.get("X-Supabase-Auth");
+
+  // Token validation
+  if (!validateToken(token, res)) return;
+
+  const supabase = await getSupabaseClientWithAuth(token!, res);
+  if (!supabase) return;
+
+  try {
+    const response = await updateUserStat(
+      idToNum,
+      statAmount,
+      chosenStat,
+      supabase
+    );
+    console.log(response);
+    res.status(200).json({ message: "User stat updated successfully" });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }

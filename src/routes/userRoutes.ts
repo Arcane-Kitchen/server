@@ -3,6 +3,7 @@ import {
   createNewUser,
   findUserBySupabaseId,
   updateUserLastLogin,
+  updateUserStatController,
 } from "../controllers/userController.js";
 import {
   addRecipeToMealPlan,
@@ -17,6 +18,7 @@ const router = express.Router();
 router.post("/", createNewUser);
 router.get("/:id", findUserBySupabaseId);
 router.patch("/:id/login", updateUserLastLogin);
+router.patch("/:id/stat", updateUserStatController);
 
 //meal plan-related methods
 router.get("/:id/meal-plan", getUserMealPlan); // meal-plan?start-date=<date>&end-date=<date>
