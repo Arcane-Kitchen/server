@@ -17,28 +17,6 @@ export const getById = async (
   return data;
 };
 
-// Fetch meal plan by meal plan by date and meal type
-export const getByDateAndMealType = async (
-  userId: string,
-  date: string,
-  mealType: string,
-  supabase: any
-) => {
-  const { data, error } = await supabase
-    .from("User_Recipe")
-    .select()
-    .eq("user_id", userId)
-    .eq("day_to_eat", date)
-    .eq("chosen_meal_type", mealType)
-    .single()
-
-  if (error) {
-    console.error("Error fetching meal plan: ", error);
-  }
-
-  return data;
-};
-
 // Fetch weekly meal plan from Supabase by user Id
 export const getWeeklyMealPlan = async (
   userId: string,

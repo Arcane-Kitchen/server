@@ -7,7 +7,6 @@ import {
   deleteRecipe,
   getFullMealPlan,
   getById,
-  getByDateAndMealType,
 } from "../models/mealPlanModel.js";
 import { findById } from "../models/recipeModel.js";
 import getSupabaseClientWithAuth from "../utils/supabase.js";
@@ -125,7 +124,7 @@ export const addRecipeToMealPlan = async (req: Request, res: Response) => {
 // Update a recipe in the user's meal plan by meal plan Id
 export const updateRecipeInMealPlanById = async (req: Request, res: Response) => {
   const { mealPlanId } = req.params;
-  const { dayToEat, servings, hasBeenEaten, chosenMealType } = req.body;
+  const { recipeId, dayToEat, servings, hasBeenEaten, chosenMealType } = req.body;
   const token = req.get("X-Supabase-Auth");
 
   // Token Validation
@@ -148,76 +147,24 @@ export const updateRecipeInMealPlanById = async (req: Request, res: Response) =>
       ...(hasBeenEaten !== undefined && { has_been_eaten: hasBeenEaten }),
       ...(chosenMealType && { chosen_meal_type: chosenMealType }),
     };
+    
+    // Fetch the recipe from the meal plan and update the exp
+    if (recipeId) {
+      const recipe = await findById(recipeId, supabase);
+      if (!recipe) {
+        res.status(404).json({ message: "Recipe not found" });
+        return;
+      }
+
+      const difficulty = recipe.difficulty.toLowerCase();
+      const exp = setXPForRecipeDifficulty(difficulty);
+
+      recipeProps.recipe_id = recipeId;
+      recipeProps.exp = exp
+    }
 
     // Update the recipe in the meal plan
     await updateMealPlan(mealPlanId, recipeProps, supabase);
-    res.status(200).json({ message: "Meal plan updated successfully" });
-  } catch (error: any) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-// Update a recipe in the user's meal plan by date and meal type
-export const updateRecipeInMealPlanByDateAndMealType = async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const { date, "meal-type" : mealType } = req.query;
-  const { recipeId, servings } = req.body;
-  const token = req.get("X-Supabase-Auth");
-
-  // Token Validation
-  if (!validateToken(token, res)) return;
-
-  const supabase = await getSupabaseClientWithAuth(token!, res);
-  if (!supabase) return;
-
-  // Validate required props
-  const requiredProps = ["recipeId"];
-  if (!validateProps(req.body, requiredProps, res)) return;
-
-  try {
-
-    if (typeof date !== "string" || typeof mealType !== "string") {
-      res.status(400).json({ message: "Invalid date or meal type." });
-      return;
-    }
-
-    const currentDate = new Date();
-    currentDate.setHours(0, 0, 0, 0);
-
-    const mealDate = new Date(date);
-    mealDate.setHours(0, 0, 0, 0);
-
-    // Reject the update if the meal date has already passed
-    if (mealDate < currentDate) {
-      res.status(400).json({ message: "Cannot update meal plan for past dates." });
-      return;
-    }
-
-    // Check if the the meal plan exists
-    const mealPlan = await getByDateAndMealType(id, date, mealType, supabase);
-    if (!mealPlan) {
-      res.status(404).json({ message: "Meal plan not found" });
-      return;
-    }
-
-    // Check and fetch the recipe from the meal plan
-    const recipe = await findById(recipeId, supabase);
-    if (!recipe) {
-      res.status(404).json({ message: "Recipe not found" });
-      return;
-    }
-
-    const difficulty = recipe.difficulty.toLowerCase();
-    const exp = setXPForRecipeDifficulty(difficulty);
-
-    const recipeProps: Partial<recipe> = {
-      ...(servings && { servings }),
-      recipe_id: recipeId,
-      exp,
-    }
-
-    // Update the recipe in the meal plan
-    await updateMealPlan(mealPlan.id, recipeProps, supabase);
     res.status(200).json({ message: "Meal plan updated successfully" });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
