@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { addActivityToDb, getActivityCount, addAchievementToDb, getUserAchievements } from "../models/activityModel.js";
+import { addActivityToDb, getActivityCount, getUserAchievements } from "../models/activityModel.js";
 
 export const addActivity = async (req: Request, res: Response): Promise<void> => {
   const { userId, recipeId } = req.body;
@@ -17,9 +17,7 @@ export const addActivity = async (req: Request, res: Response): Promise<void> =>
     const activityCount = await getActivityCount(userId);
 
     if (activityCount.length === 1) {
-      // Save achievement to user_achievement table with reward_id 7
-      await addAchievementToDb(userId, 7);
-      res.status(200).json({ message: 'Achievement unlocked: First Recipe Added' });
+      res.status(200).json({ message: 'First activity added' });
       return;
     }
 

@@ -30,20 +30,6 @@ export const getActivityCount = async (userId: number) => {
   return data;
 };
 
-export const addAchievementToDb = async (userId: number, rewardId: number) => {
-  console.log(`Adding achievement to User_Achievements: user_id=${userId}, reward_id=${rewardId}`);
-  
-  const { data, error } = await supabase
-    .from('User_Achievements')
-    .insert([{ user_id: userId, reward_id: rewardId }]);
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return data;
-};
-
 export const getUserAchievements = async (userId: number) => {
   const { data, error } = await supabase
     .from('User_Achievements')
