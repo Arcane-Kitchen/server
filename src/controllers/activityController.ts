@@ -1,25 +1,17 @@
 import { Request, Response } from "express";
-import { addActivityToDb, getActivityCount, getUserAchievements } from "../models/activityModel.js";
+import { addActivityToDb, getUserAchievements } from "../models/activityModel.js";
 
 export const addActivity = async (req: Request, res: Response): Promise<void> => {
-  const { userId, recipeId } = req.body;
+  const { userId, recipeId, activity_type } = req.body;
 
-  if (typeof userId !== 'number' || typeof recipeId !== 'number') {
-    res.status(400).json({ error: 'User ID and Recipe ID must be numbers' });
+  if (typeof userId !== 'number' || typeof recipeId !== 'number' || typeof activity_type !== 'string') {
+    res.status(400).json({ error: 'User ID and Recipe ID must be numbers, and Activity Type must be a string' });
     return;
   }
 
   try {
     // Save activity to user_activity table
-    await addActivityToDb(userId, recipeId);
-
-    // Check if it's the first time the user adds a recipe to their calendar
-    const activityCount = await getActivityCount(userId);
-
-    if (activityCount.length === 1) {
-      res.status(200).json({ message: 'First activity added' });
-      return;
-    }
+    await addActivityToDb(userId, recipeId, activity_type);
 
     res.status(200).json({ message: 'Activity added successfully' });
   } catch (error) {
