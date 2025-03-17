@@ -149,5 +149,16 @@ export const updateUserStat = async (
     } else {
       return "success";
     }
+  } else if (chosenStat === "enemies_defeated") {
+    const { error } = await supabase
+      .from("User")
+      .update({ enemies_defeated: statAmount })
+      .eq("id", userId);
+    if (error) {
+      console.error("Error updating stat: ", error);
+      return null;
+    } else {
+      return "success";
+    }
   }
 };
