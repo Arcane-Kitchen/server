@@ -2,7 +2,9 @@ import express from "express";
 import cors from "cors";
 import userRoutes from "./routes/userRoutes.js";
 import recipeRoutes from "./routes/recipeRoutes.js";
-import activityRoutes from "./routes/activityRoutes.js"
+import activityRoutes from "./routes/activityRoutes.js";
+import enemyRoutes from "./routes/enemyRoutes.js";
+
 import schedule from "node-schedule";
 
 const PORT = process.env.PORT;
@@ -36,6 +38,7 @@ app.use(
 app.use("/users", userRoutes);
 app.use("/recipes", recipeRoutes);
 app.use("/activity", activityRoutes);
+app.use("/enemy", enemyRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
