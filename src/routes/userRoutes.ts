@@ -4,6 +4,8 @@ import {
   findUserBySupabaseId,
   updateUserLastLogin,
   updateUserStatController,
+  updateUserCalorieAndMacrosGoal,
+  updateUserPet,
 } from "../controllers/userController.js";
 import {
   addRecipeToMealPlan,
@@ -19,6 +21,9 @@ router.post("/", createNewUser);
 router.get("/:id", findUserBySupabaseId);
 router.patch("/:id/login", updateUserLastLogin);
 router.patch("/:id/stat", updateUserStatController);
+router.patch("/:id/goals", updateUserCalorieAndMacrosGoal);
+router.patch("/:id/pet", updateUserPet);
+
 
 //meal plan-related methods
 router.get("/:id/meal-plan", getUserMealPlan); // meal-plan?start-date=<date>&end-date=<date>

@@ -3,6 +3,20 @@ interface user {
   username: string;
 }
 
+export interface UserGoals {
+  daily_calorie_goal: number,
+  daily_carb_goal: number,
+  daily_fat_goal: number,
+  daily_protein_goal: number,
+}
+
+export interface Pet {
+  pet_name: string,
+  pet_img_happy: string,
+  pet_img_normal: string,
+  pet_img_sad: string,
+}
+
 // Insert new user to Supabase
 export const create = async (user: user, supabase: any) => {
   const { error } = await supabase.from("User").insert(user);
@@ -149,5 +163,37 @@ export const updateUserStat = async (
     } else {
       return "success";
     }
+  }
+};
+
+// update daily calorie and macros goal
+export const updateCalorieAndMacrosGoal = async (
+  userId: number,
+  supabase: any,
+  userGoals: UserGoals,
+) => {
+  const { error } = await supabase
+    .from("User")
+    .update(userGoals)
+    .eq("id", userId);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+};
+
+// update pet information
+export const updatePet = async (
+  userId: number,
+  supabase: any,
+  pet: Pet,
+) => {
+  const { error } = await supabase
+    .from("User")
+    .update(pet)
+    .eq("id", userId);
+
+  if (error) {
+    throw new Error(error.message);
   }
 };

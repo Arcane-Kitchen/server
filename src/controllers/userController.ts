@@ -4,6 +4,10 @@ import {
   findById,
   updateLastLogin,
   updateUserStat,
+  updateCalorieAndMacrosGoal,
+  updatePet,
+  UserGoals,
+  Pet
 } from "../models/userModel.js";
 import getSupabaseClientWithAuth from "../utils/supabase.js";
 import { validateToken, validateProps } from "../utils/validation.js";
@@ -107,6 +111,70 @@ export const updateUserStatController = async (req: Request, res: Response) => {
     );
     console.log(response);
     res.status(200).json({ message: "User stat updated successfully" });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Update user's daily calorie and macros goal
+export const updateUserCalorieAndMacrosGoal = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { calories, carbs, fats, protein } = req.body;
+  const token = req.get("X-Supabase-Auth");
+
+  // Token Validation
+  if (!validateToken(token, res)) return;
+
+  const supabase = await getSupabaseClientWithAuth(token!, res);
+  if (!supabase) return;
+  
+  // Validate required props
+  const requiredProps = ["calories", "carbs", "fats", "protein"];
+  if (!validateProps(req.body, requiredProps, res)) return;
+
+  try {
+    const userGoalProps: UserGoals = {
+      "daily_calorie_goal": Math.floor(calories),
+      "daily_carb_goal": carbs.percentage,
+      "daily_fat_goal": fats.percentage,
+      "daily_protein_goal": protein.percentage,
+    };
+
+    // Update user's goals
+    await updateCalorieAndMacrosGoal(parseInt(id, 10), supabase, userGoalProps);
+    res.status(200).json({ message: "User daily calorie and macros goal updated successfully" });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Update user's pet information
+export const updateUserPet = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { name, imageUrl } = req.body;
+  const token = req.get("X-Supabase-Auth");
+
+  // Token Validation
+  if (!validateToken(token, res)) return;
+
+  const supabase = await getSupabaseClientWithAuth(token!, res);
+  if (!supabase) return;
+  
+  // Validate required props
+  const requiredProps = ["name", "imageUrl"];
+  if (!validateProps(req.body, requiredProps, res)) return;
+
+  try {
+    const petProps: Pet = {
+      "pet_name": name,
+      "pet_img_happy": imageUrl.happy,
+      "pet_img_normal": imageUrl.neutral,
+      "pet_img_sad": imageUrl.sad,
+    };
+
+    // Update user's goals
+    await updatePet(parseInt(id, 10), supabase, petProps);
+    res.status(200).json({ message: "User pet information updated successfully" });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
