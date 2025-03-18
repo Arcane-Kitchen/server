@@ -48,6 +48,6 @@ export const addRecipe = async (recipeData: any, supabase: any) => {
   if (error) {
     throw new Error(error.message);
   }
-
+  
   return data;
 };

@@ -112,10 +112,19 @@ export const addRecipeToMealPlan = async (req: Request, res: Response) => {
       ...(hasBeenEaten && { has_been_eaten: hasBeenEaten }),
     };
 
-    await addRecipe(recipeProps, supabase);
+    const newMeal = await addRecipe(recipeProps, supabase);
     res
       .status(201)
-      .json({ message: "New recipe added to meal plan successfully" });
+      .json({ message: "New recipe added to meal plan successfully", mealPlan: { 
+        id: newMeal[0].id,
+        recipeId: newMeal[0].recipe_id,
+        date: new Date(newMeal[0].day_to_eat).toLocaleDateString(),
+        mealType: newMeal[0].chosen_meal_type,
+        imageUrl: recipe.image,
+        hasBeenEaten: newMeal[0].has_been_eaten,
+        exp: newMeal[0].exp,
+        calories: recipe.nutrition.calories,
+      }});
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }

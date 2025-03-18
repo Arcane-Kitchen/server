@@ -67,7 +67,7 @@ export const getRecipe = async (mealPlanId: string, supabase: any) => {
 };
 
 export const addRecipe = async (recipe: recipe, supabase: any) => {
-  const { data, error } = await supabase.from("User_Recipe").insert(recipe);
+  const { data, error } = await supabase.from("User_Recipe").insert(recipe).select();
 
   if (error) {
     throw new Error(error.message);
