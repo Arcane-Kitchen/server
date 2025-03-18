@@ -4,6 +4,8 @@ import userRoutes from "./routes/userRoutes.js";
 import recipeRoutes from "./routes/recipeRoutes.js";
 import activityRoutes from "./routes/activityRoutes.js";
 import enemyRoutes from "./routes/enemyRoutes.js";
+import chatRoutes from "./routes/chatRoutes.js"; 
+
 
 import schedule from "node-schedule";
 
@@ -39,6 +41,8 @@ app.use("/users", userRoutes);
 app.use("/recipes", recipeRoutes);
 app.use("/activity", activityRoutes);
 app.use("/enemy", enemyRoutes);
+app.use("/api", chatRoutes); 
+
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
