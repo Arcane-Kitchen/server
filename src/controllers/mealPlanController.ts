@@ -21,7 +21,28 @@ export interface recipe {
   servings?: number;
   exp: number;
   chosen_meal_type: string;
-  has_been_eaten?: boolean;
+  has_been_eaten?: 
+  boolean;
+}
+
+export interface Meal {
+  id: string;
+  day_to_eat: string;
+  chosen_meal_type: string;
+  exp: number;
+  has_been_eaten: boolean;
+  Recipe: {
+    id: string,
+    image: string;
+    nutrition: {
+      calories: number,
+      macronutrients: {
+        fat: { unit: string; amount: number; percentage: number };
+        carbs: { unit: string; amount: number; percentage: number };
+        protein: { unit: string; amount: number; percentage: number };
+      };
+    }
+  }
 }
 
 // Fetch the user's meal plan for the week
@@ -56,7 +77,20 @@ export const getUserMealPlan = async (req: Request, res: Response) => {
 
     // If no start-date or end-date, fetch the full meal plan
     const results = await getFullMealPlan(id, supabase);
-    res.status(200).json(results);
+    const mappedResults = results.map((meal: Meal) => {
+      return { 
+        "id": meal.id, 
+        "date": new Date(meal.day_to_eat).toLocaleDateString(), 
+        "mealType": meal.chosen_meal_type.toLowerCase(),
+        "exp": meal.exp, 
+        "hasBeenEaten": meal.has_been_eaten,
+        "recipeId": meal.Recipe.id,
+        "imageUrl": meal.Recipe.image,
+        "calories": meal.Recipe.nutrition.calories,
+      }
+    })
+    console.log(mappedResults)
+    res.status(200).json(mappedResults);
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }

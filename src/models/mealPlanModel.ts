@@ -42,7 +42,7 @@ export const getWeeklyMealPlan = async (
 export const getFullMealPlan = async (userId: string, supabase: any) => {
   const { data, error } = await supabase
     .from("User_Recipe")
-    .select()
+    .select("id, day_to_eat, chosen_meal_type, exp, has_been_eaten, Recipe(id, image, nutrition)")
     .eq("user_id", userId);
 
   if (error) {
