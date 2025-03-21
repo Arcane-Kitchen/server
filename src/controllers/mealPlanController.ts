@@ -21,8 +21,7 @@ export interface recipe {
   servings?: number;
   exp: number;
   chosen_meal_type: string;
-  has_been_eaten?: 
-  boolean;
+  has_been_eaten?: boolean;
 }
 
 export interface Meal {
@@ -89,7 +88,6 @@ export const getUserMealPlan = async (req: Request, res: Response) => {
         "calories": meal.Recipe.nutrition.calories,
       }
     })
-    console.log(mappedResults)
     res.status(200).json(mappedResults);
   } catch (error: any) {
     res.status(500).json({ error: error.message });
