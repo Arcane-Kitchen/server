@@ -57,7 +57,6 @@ export const imageWithAi = async (req: Request, res: Response): Promise<void> =>
 
     const data = await response.json() as { data: { url: string }[] };
     const imageUrl = data.data[0]?.url;
-    console.log(imageUrl);
     if (!imageUrl) {
       res.status(500).json({ error: 'Failed to generate image: imageUrl is undefined' });
       return;
