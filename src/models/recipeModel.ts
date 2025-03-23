@@ -43,7 +43,7 @@ export const getNutritionFromId = async (recipeId: number, supabase: any) => {
 
 // Add a new recipe to the database
 export const addRecipe = async (recipeData: any, supabase: any) => {
-  const { data, error } = await supabase.from("Recipe").insert(recipeData);
+  const { data, error } = await supabase.from("Recipe").insert(recipeData).select();
 
   if (error) {
     throw new Error(error.message);
