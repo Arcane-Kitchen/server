@@ -103,13 +103,12 @@ export const updateUserStatController = async (req: Request, res: Response) => {
   if (!supabase) return;
 
   try {
-    const response = await updateUserStat(
+    await updateUserStat(
       idToNum,
       statAmount,
       chosenStat,
       supabase
     );
-    console.log(response);
     res.status(200).json({ message: "User stat updated successfully" });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
@@ -172,7 +171,7 @@ export const updateUserPet = async (req: Request, res: Response) => {
       "pet_img_sad": imageUrl.sad,
     };
 
-    // Update user's goals
+    // Update user's pet
     await updatePet(parseInt(id, 10), supabase, petProps);
     res.status(200).json({ message: "User pet information updated successfully" });
   } catch (error: any) {
