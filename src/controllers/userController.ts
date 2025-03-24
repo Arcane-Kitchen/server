@@ -93,7 +93,7 @@ export const updateUserLastLogin = async (req: Request, res: Response) => {
 export const updateUserStatController = async (req: Request, res: Response) => {
   const { id } = req.params;
   const idToNum = Number(id);
-  const { statAmount, chosenStat } = req.body;
+  const { carb, fat, protein, calorie, wisdom, enemiesDefeated } = req.body;
   const token = req.get("X-Supabase-Auth");
 
   // Token validation
@@ -103,12 +103,16 @@ export const updateUserStatController = async (req: Request, res: Response) => {
   if (!supabase) return;
 
   try {
-    await updateUserStat(
-      idToNum,
-      statAmount,
-      chosenStat,
-      supabase
-    );
+    const statProps = {
+      ...(calorie && { pet_calorie_exp: calorie }),
+      ...(carb && { pet_carb_exp: carb }),
+      ...(protein && { pet_protein_exp: protein }),
+      ...(fat && { pet_fat_exp: fat }),
+      ...(wisdom && { pet_wisdom_exp: wisdom }),
+      ...(enemiesDefeated && { enemies_defeated: enemiesDefeated }),
+    };
+
+    await updateUserStat(idToNum, statProps, supabase);
     res.status(200).json({ message: "User stat updated successfully" });
   } catch (error: any) {
     res.status(500).json({ error: error.message });

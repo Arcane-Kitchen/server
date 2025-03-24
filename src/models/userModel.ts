@@ -104,76 +104,17 @@ export const updateLastLogin = async (
 // update user stat
 export const updateUserStat = async (
   userId: number,
-  statAmount: number,
-  chosenStat: string,
+  stats: any,
   supabase: any
 ) => {
-  if (chosenStat === "calorie") {
-    const { error } = await supabase
-      .from("User")
-      .update({ pet_calorie_exp: statAmount })
-      .eq("id", userId);
-    if (error) {
-      console.error("Error updating stat: ", error);
-      return null;
-    } else {
-      return "success";
-    }
-  } else if (chosenStat === "carb") {
-    const { error } = await supabase
-      .from("User")
-      .update({ pet_carb_exp: statAmount })
-      .eq("id", userId);
-    if (error) {
-      console.error("Error updating stat: ", error);
-      return null;
-    } else {
-      return "success";
-    }
-  } else if (chosenStat === "protein") {
-    const { error } = await supabase
-      .from("User")
-      .update({ pet_protein_exp: statAmount })
-      .eq("id", userId);
-    if (error) {
-      console.error("Error updating stat: ", error);
-      return null;
-    } else {
-      return "success";
-    }
-  } else if (chosenStat === "fat") {
-    const { error } = await supabase
-      .from("User")
-      .update({ pet_fat_exp: statAmount })
-      .eq("id", userId);
-    if (error) {
-      console.error("Error updating stat: ", error);
-      return null;
-    } else {
-      return "success";
-    }
-  } else if (chosenStat === "wisdom") {
-    const { error } = await supabase
-      .from("User")
-      .update({ pet_wisdom_exp: statAmount })
-      .eq("id", userId);
-    if (error) {
-      console.error("Error updating stat: ", error);
-      return null;
-    } else {
-      return "success";
-    }
-  } else if (chosenStat === "enemies_defeated") {
-    const { error } = await supabase
-      .from("User")
-      .update({ enemies_defeated: statAmount })
-      .eq("id", userId);
-    if (error) {
-      console.error("Error updating stat: ", error);
-      return null;
-    } else {
-      return "success";
-    }
+
+  const { error } = await supabase
+    .from("User")
+    .update(stats)
+    .eq("id", userId);
+
+  if (error) {
+    console.error("Error updating stat: ", error);
   }
 };
 

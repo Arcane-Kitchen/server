@@ -86,6 +86,11 @@ export const getUserMealPlan = async (req: Request, res: Response) => {
         "recipeId": meal.Recipe.id,
         "imageUrl": meal.Recipe.image,
         "calories": meal.Recipe.nutrition.calories,
+        "macronutrients": {
+          "fat": meal.Recipe.nutrition.macronutrients.fat.percentage,
+          "carbs": meal.Recipe.nutrition.macronutrients.carbs.percentage,
+          "protein": meal.Recipe.nutrition.macronutrients.protein.percentage,
+        }
       }
     })
     res.status(200).json(mappedResults);
@@ -156,6 +161,11 @@ export const addRecipeToMealPlan = async (req: Request, res: Response) => {
         hasBeenEaten: newMeal[0].has_been_eaten,
         exp: newMeal[0].exp,
         calories: recipe.nutrition.calories,
+        macronutrients: {
+          fat: recipe.nutrition.macronutrients.fat.percentage,
+          carbs: recipe.nutrition.macronutrients.carbs.percentage,
+          protein: recipe.nutrition.macronutrients.protein.percentage,
+        }
       }});
   } catch (error: any) {
     res.status(500).json({ error: error.message });
