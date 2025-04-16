@@ -6,9 +6,6 @@ import activityRoutes from "./routes/activityRoutes.js";
 import enemyRoutes from "./routes/enemyRoutes.js";
 import chatRoutes from "./routes/chatRoutes.js"; 
 
-
-import schedule from "node-schedule";
-
 const PORT = process.env.PORT;
 
 const app = express();
@@ -31,10 +28,6 @@ app.use(
   })
 );
 
-// updates users pet stats every day at midnight
-// schedule.scheduleJob("0 0 * * *", async () => {
-//   petStatsCalc();
-// });
 
 // API Routes
 app.use("/users", userRoutes);
