@@ -14,3 +14,7 @@ The features included in Arcane Kitchen:
  - A combat system for your pet to use its stats to battle with enemies.
  - Achievements unlocked as you plan, eat, and battle
 
+# Architecture Diagram
+
+![image](https://github.com/user-attachments/assets/7172d58a-21a8-4397-b569-7729593d5407)
+
